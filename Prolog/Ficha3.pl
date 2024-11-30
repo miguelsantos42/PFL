@@ -1,4 +1,4 @@
-:- use_module(library(lists)).
+:- use_module(library(lists), permutation).
 %%1
 %a) a) | ?- [a | [b, c, d] ] = [a, b, c, d]  -> True
 %b) [a | b, c, d ] = [a, b, c, d]  -> False
@@ -103,5 +103,33 @@ list_perm(Lista1,Lista2):-
 
 %%g)replicate(+Amount, +Elem, ?List) 
 replicate(0,_,[]).
-replicate(Amount, Elem, List):-
-  replicate
+replicate(Amount, Elem, [Elem|List]):-
+  Amount > 0,
+  Amount1 is Amount - 1,
+  replicate(Amount1, Elem, List).
+
+%%h)intersperse(+Elem, +List1, ?List2)
+intersperse(_,[],[]).
+intersperse(X,[H|T],[H,X|L]):-
+  intersperse(X,T,L).
+
+%%i)insert_elem(+Index, +List1, +Elem, ?List2)
+insert_elem(0,L,X,[X|L]).
+insert_elem(N,[H|T],X,[H|R]):-
+  N >= 1,
+  N1 is N - 1,
+  insert_elem(N1,T,X,R).
+
+%%j)delete_elem(+Index, +List1, ?Elem, ?List2)
+delete_elem(0,[E|T],E,T).
+delete_elem(N,[H|T],E,[H|L]):-
+  N >= 1,
+  N1 is N-1,
+  delete_elem(N1,T,E,L).
+
+%%k)replace(+List1, +Index, ?Old, +New, ?List2)
+replace([H|T],0,H,E,[E|T]).
+replace([H|T], Index, Old, X, [H|L]):-
+  Index >= 1,
+  Index1 is Index - 1,
+  replace(T,Index1,Old,X,L).
