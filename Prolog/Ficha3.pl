@@ -133,3 +133,90 @@ replace([H|T], Index, Old, X, [H|L]):-
   Index >= 1,
   Index1 is Index - 1,
   replace(T,Index1,Old,X,L).
+
+
+% %%%4
+% %%a)list_append(?L1, ?L2, ?L3)
+% list_append([],L2,L2).
+% list_append([H1|T1], L2, [H1|L3]):-
+%   list_append(T1,L2,L3).
+
+% %%b)list_member(?Elem, ?List) -> ?????????????????????
+% list_member(?Elem, ?List)
+
+
+% %%c)list_last(+List, ?Last)  -> ??????????????????????
+% list_last(+List, ?Last)
+
+% %d)list_nth(?N, ?List, ?Elem) -> ?????????????????????
+% % list_nth(N,List,Elem):-
+% %   append(Prefix,[Elem|_],List),
+% %   length(Prefix,N).
+
+% %e) list_append(+ListOfLists, ?List)
+
+%%%5
+%%a)
+list_to(0,[]).
+list_to(N, L) :-
+  N >= 1,
+  list_tohelper(1,N,L).
+
+list_tohelper(Actual,N,[]) :- Actual > N.
+list_tohelper(Actual,N,[Actual|L]):-
+  Actual =< N,
+  Next is Actual + 1,
+  list_tohelper(Next,N,L).
+
+%%b)
+list_from_to(Sup,Sup,[Sup]).
+list_from_to(Inf, Sup, [Inf|List]):-
+  Inf =< Sup,
+  Inf1 is Inf + 1,
+  list_from_to(Inf1,Sup,List).
+
+%%c)
+list_from_to_step(Inf,Sup,_,[]) :- Sup < Inf.
+list_from_to_step(Inf, Sup, Step, [Inf|List]):- 
+  Inf =< Sup,
+  Inf1 is Inf + Step,
+  list_from_to_step(Inf1,Sup,Step,List).
+
+%d)
+list_from_to_reverse(Inf,Inf,[Inf]).
+list_from_to_reverse(Inf, Sup, [Sup|List]):-
+  Sup >= Inf,
+  Sup1 is Sup - 1,
+  list_from_to_reverse(Inf,Sup1,List).
+
+list_from_to_step_reverse(Inf,Inf,_,[]).
+list_from_to_step_reverse(Inf, Sup, Step, [Sup|List]):- 
+  Sup >= Inf,
+  Sup1 is Sup - Step,
+  list_from_to_step_reverse(Inf,Sup1,Step,List).
+
+%%e)???????????????????????????????????????????
+
+%%f)???????????????????????????????????????????
+
+%%%7
+%%a)
+is_ordered([]).
+is_ordered([_]).
+is_ordered([X,Y|T]):-
+  X =< Y,
+  is_ordered([Y|T]).
+
+%%b)
+insert_ordered(X,[],[X]).
+insert_ordered(V, [H|T], [V,H|T]):- 
+  V =< H.
+insert_ordered(V, [H|T], [H|L]):-
+  H =< V,
+  insert_ordered(V,T,L).
+
+%%c)
+insert_sort([],[]).
+insert_sort([H|T], L):-
+  insert_sort(T,L1),
+  insert_ordered(H,L1,L).
