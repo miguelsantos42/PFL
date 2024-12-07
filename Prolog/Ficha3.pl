@@ -135,25 +135,69 @@ replace([H|T], Index, Old, X, [H|L]):-
   replace(T,Index1,Old,X,L).
 
 
-% %%%4
-% %%a)list_append(?L1, ?L2, ?L3)
-% list_append([],L2,L2).
-% list_append([H1|T1], L2, [H1|L3]):-
-%   list_append(T1,L2,L3).
+%%%4
+%%a)list_append(?L1, ?L2, ?L3)
+list_append([],L2,L2).
+list_append([H1|T1], L2, [H1|L3]) :-
+  list_append(T1,L2,L3).
 
-% %%b)list_member(?Elem, ?List) -> ?????????????????????
-% list_member(?Elem, ?List)
+%%b)list_member(?Elem, ?List)
+list_member(Elem, List) :- append(_, [Elem | _] , List).
+
+%% List -> [1,2,3,4]
+%% Elem -> 2
+
+%% append(_, [2 | _], [1,2,3,4]) -> [_ | 2 | _] = [1,2,3,4]
+%% [_ | Elem | _ ] -> [.. Elem ..]
 
 
-% %%c)list_last(+List, ?Last)  -> ??????????????????????
-% list_last(+List, ?Last)
+%%c)list_last(+List, ?Last) 
+list_last(List, Last) :- append(_, [Last], List).
 
-% %d)list_nth(?N, ?List, ?Elem) -> ?????????????????????
-% % list_nth(N,List,Elem):-
-% %   append(Prefix,[Elem|_],List),
-% %   length(Prefix,N).
+%% [_ | Last]
 
-% %e) list_append(+ListOfLists, ?List)
+%% List -> [1,2,3,4]
+%% Last -> 5
+%% [1,2,3,4,5] -> [1,2,3,4 | 5] -> [1,2,3,4] [5] : List
+
+%%
+
+%d)list_nth(?N, ?List, ?Elem)
+list_nth(N,List,Elem):-
+N1 is N - 1,
+length(Prefix, N1),
+append(Prefix, [Elem | _] , List).
+
+
+%e) list_append(+ListOfLists, ?List)
+list_append1([],[]).
+list_append1([H|T], List):-
+  append(H,Resto,List),
+  list_append1(T, Resto).
+
+
+%f) list_del(+List, +Elem, ?Res)
+list_del(List,Elem,Res):-
+  append(Prefix, [Elem|Sufix], List),
+  append(Prefix, Sufix, Res).
+
+%g)list_before(?First, ?Second, ?List)
+list_before(First, Second, List):-
+  append(Prefix,[First|Rest],List),
+  append(_,[Second|_],Rest).
+
+%h) list_replace_one(+X, +Y, +List1, ?List2)
+list_replace_one(X, Y, List1, List2):-
+append(Prefix,[X|Suffix], List1),
+append(Prefix,[Y|Suffix], List2).
+
+%i) list_repeated(+X, +List)
+list_repeated(X, List):-
+  append(Prefix, [X|Rest], List),
+  append(_, [X|_], Rest).
+
+%j)list_slice(+List1, +Index, +Size, ?List2)
+
 
 %%%5
 %%a)
