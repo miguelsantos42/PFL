@@ -166,11 +166,86 @@ print_text(Text, Symbol, Padding):-
 %%%%%%%%%% 6 -> List Printing
 
 %%%%%a)
-print_full_list([]) :- !.
+print_full_list([]).
 print_full_list([H]) :-
-  write(H).
+  write(H), !.
 print_full_list([H|T]):-
   write(H),
   write(', '),
   print_full_list(T).
 
+%%%%%b)
+print_list([]).
+print_list(L):-
+  length(L, N),
+  N =< 11,
+  write('['),
+  print_full_list(L),
+  write(']').
+print_list(L):-
+  length(L, N),
+  N >= 12,
+  write('['),
+  get_first_elements(L, First),
+  print_full_list(First),
+  write(', ... , '),
+  get_middle_elements(L, Middle),
+  print_full_list(Middle),
+  write(', ... , '),
+  get_last_elements(L, Last),
+  print_full_list(Last),
+  write(']').
+
+get_first_elements(L, Elements) :- 
+  length(Elements,3),
+  append(Elements, _, L).
+
+get_middle_elements(L, Elements) :-
+  length(L,N),
+  N1 is N // 2 - 1,
+  length(First, N1),
+  append(First, Last, L),
+  get_first_elements(Last, Elements).
+   
+/*
+
+[a,b,c,d,e,f,g] -> Head
+[h,i,j,k,l,m,n,o,p] -> Tail
+
+First -> 3
+[a,b,c,d,e,f,g]
+
+append([_,_,_], Middle, [a,b,c,d,e,f,g])
+
+get_first_elements(Tail, Elements).`
+
+
+*/
+
+
+get_last_elements(L, Elements) :-
+  length(Elements,3),
+  append(_,Elements,L).
+
+  % [_,_,_]
+  % [1,2,3,4,5]
+  % append([_,_,_,_], _, L) -> [1,2,3,4]
+
+/*
+
+[0, 2]
+[N/2-1, N/2+1]
+[N-3, N-1]
+
+*/
+
+%%%%%%c)
+print_matrix([]).
+print_matrix([H|T]):-
+  write('['),
+  print_full_list(H),
+  write(']'),nl,
+  print_matrix(T).
+
+
+  

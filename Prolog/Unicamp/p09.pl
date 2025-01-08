@@ -13,14 +13,14 @@ helper(Current, [ImmediateNext | Nexts], [ImmediateNext | Nexts], [Current]) :- 
 helper(Current, [Current | Nexts], DifferentNexts , [Current | WhatsNext]) :- helper(Current, Nexts, DifferentNexts, WhatsNext). 
 */
 
-
-pack([], []).
-
+pack([],[]).
 pack([X],[[X]]).
 
-pack([Current , Current | Next], [[Current | Sublist] | X]) :-
-  pack([Current|Next], [Sublist|X]).
+pack([X,X|T],[[X|Sublist]|List]):-
+  pack([X|T],[Sublist|List]).
 
-pack([Z , Y | Next], [[Z]|X]):-
-  Z \= Y,
-  pack([Y|Next], X).
+pack([Y,Z|T],[[Y]|List]):-
+  Y \= Z,
+  pack([Z|T],List).
+
+

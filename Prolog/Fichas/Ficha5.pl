@@ -1,3 +1,5 @@
+:- use_module(library(lists)).
+
 %%%%%%%%%%%%%%%%%%%1 -> Family Relations Reloaded
 male(frank).
 male(jay).
@@ -53,6 +55,9 @@ parent(cameron,rexford).
 parent(pameron,calhoun).
 parent(bo,calhoun).
 
+parent(haley, george).
+parent(haley, poppy).
+
 % Casais na árvore genealógica
 married(jay, gloria).
 married(gloria, jay).
@@ -87,7 +92,7 @@ children_of([Person|ListOfPeople], [Person-Children|ListOfPairs]):-
 
 %%%%c)
 family(F):-
-  findall(Person, (parent(Person,_); parent(_,Person); married(Person,_)), AllFamily).
+  findall(Person, (parent(Person,_); parent(_,Person); married(Person,_)), AllFamily),
   sort(AllFamily,F).
 
 %%%%d)
@@ -106,13 +111,31 @@ spouse_children(Person, Spouse/Children):-
   children(Person,Children).
 
 %%%%%g)
-%%immediate_family(+Person, -PC):-
+immediate_family(Person, PC):-
+  parent(Father, Person),
+  male(Father),
+  parent(Mother, Person),
+  female(Mother),
+  married(Spouse, Person),
+  children(Person, Children),
+  PC = [Father, Mother]-[Spouse/Children].
+
+/*
+
+parent(Father, Person), male(Father).
+parent(Mother, Person), female(Mother).
+
+married(Spouse, Person).
+
+children(Person, Children).
+
+*/
+  
+%%%% [Father, Mother]-[Spouse, Child, Child]
   
 %%%%%h)
  parents_of_two(Parents):-
   setof(Parent,(parent(Parent,X), parent(Parent,Y), X \= Y), Parents).
-
-
 
 
 %%%%%%%%%%%%%%%%%%%3 -> Schedules
@@ -152,10 +175,50 @@ courses(L):-
   findall(Course, class(Course,_,_,_,_), AllCourses),
   sort(AllCourses,L).
 
-% courses1(L1):-
-%   setof(Course, Type^Day^Time^Duration^class(Course,Type,Day,Time,Duration), L).
+courses1(L1):-
+  setof(Course, Type^Day^Time^Duration^class(Course,Type,Day,Time,Duration), L1).
 
-%%%%f) -> ??????????????????????????????
+/*
+
+class(pfl, t, '2 Tue', 15, 2). 
+class(pfl, tp, '2 Tue', 10.5, 2). 
+class(lbaw, t, '3 Wed', 10.5, 2). 
+
+setof(Course, class(Course,_,_,_,_), L1).
+
+
+findall(X, member(X-Y, [a-1, b-1, c-1]), List). -> List = [a,b,c]
+bagof(X, member(X-Y, [a-1, b-1, c-2]), List). -> Y=1, List=[a,b] ; Y=2, List=[c].
+bagof(X, Y^member(X-Y, [a-1, b-1, c-2]), List). -> List = [a,b,c]
+
+class(lbaw, t, '3 Wed', 10.5, 2).
+
+*/
+
+%%%%f) 
+schedule:-
+  findall(class(Course, Type, Day, Time, Duration), class(Course, Type, Day, Time, Duration), Classes),
+  sort_classes(Classes, SortedClasses),
+  write(SortedClasses).
+
+sort_classes(Classes, SortedClasses) :-
+  maplist(add_key_to_class, Classes, ClassesWithKey),
+  keysort(ClassesWithKey, SortedClassesWithKey),
+  maplist(remove_key_to_class, SortedClassesWithKey, SortedClasses).
+
+add_key_to_class(class(Course, Type, Day, Time, Duration), Key-class(Course, Type, Day, Time, Duration)) :- 
+  Key = Day-Time.
+
+remove_key_to_class(_-class(Course, Type, Day, Time, Duration), class(Course, Type, Day, Time, Duration)).
+
+/*
+keysort()
+
+Key-Value
+
+(Day-Time)-Class
+*/
+
 
 %%%4
 %flight(origin, destination, company, code, hour, duration)
@@ -184,14 +247,16 @@ get_all_nodes(L):-
   sort(Nodes,L).
 
 %%%c)
-find_flights(Ni,Nf,Fs):-
-  dfs([Ni],NF,Fs).
 
-dfs([NF|_],NF,[]).
-dfs([Na|T],NF,[F|Fs]):-
-  direct_flight(Na,Nb,F),
-  \+member(Nb,[Na|T]),
-  dfs([Nb,Na|T],Nf,Fs).
+find_flights(Origin, Destination, Flights) :-
+  dfs([Origin], Destination, Flights).
+
+dfs([Destination | _], Destination, []).
+dfs([Current | Next], Destination, [Code | NextCodes]) :-
+  flight(Current, Nb, _ , Code , _ , _),
+  \+ member(Nb, [Current | Next]),
+  dfs([Nb, Current | Next], Destination, NextCodes).
+
 
 %%%d)
 find_flights_bfs(Ni,Nf,Fs):-
@@ -204,7 +269,7 @@ bfs([[Nf|_]-Fs|_],Nf,Fs).
 bfs([[Na|T]-Fs|Ns],Nf,Sol):-
   findall([Nb,Na|T]-[F|Fs],(
     direct_flight(Na,Nb,F),
-    \+member(Nb,[Na|T]),
+    \+member(Nb,[Na|T])
   ),Ns1),
   append(Ns,Ns1,Ns2),
   bfs(Ns2,Nf,Sol).
