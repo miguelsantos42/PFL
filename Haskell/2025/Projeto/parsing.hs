@@ -5,7 +5,7 @@
 
   Pedro Vasconcelos, 2025
 -}
-module Main where
+module Parsing where
 
 import Parsing
 import Data.Char
