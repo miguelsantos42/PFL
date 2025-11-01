@@ -102,7 +102,7 @@ termCont acc = do char '*'
            <|> do char '/'
                   f <- factor
                   termCont (Div acc f) 
-           <|> do string "mod"
+           <|> do char '%'
                   f <- factor
                   termCont (Mod acc f)
            <|> return acc           
@@ -158,7 +158,7 @@ execute env input
 cmdHelper :: Env -> Command -> (String, Env)
 cmdHelper env (Assign name expr) = -- Env -> String -> (String, Env)
        let var = eval env expr
-           newEnv = updateEnv name var env
+           newEnv = updateEnv env name var
        in (show var, newEnv)
 cmdHelper env (Expression expr) = 
        let var = eval env expr
